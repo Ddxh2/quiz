@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 import { Toggle } from ".";
 import { colourGradients, fontStyle, getBaseSizes, shuffle } from "../utils/";
 
@@ -168,6 +169,26 @@ const Question = ({
       }correct`}</Message>
     </QuestionWrapper>
   );
+};
+
+Question.propTypes = {
+  visible: PropTypes.bool,
+  questionId: PropTypes.number.isRequired,
+  onComplete: PropTypes.func,
+  data: PropTypes.shape({
+    question: PropTypes.string,
+    answerSets: PropTypes.arrayOf(
+      PropTypes.shape({
+        correctChoice: PropTypes.string,
+        incorrectChoice: PropTypes.arrayOf(PropTypes.string),
+      })
+    ),
+  }),
+  onResize: PropTypes.func,
+};
+
+Question.defaultProps = {
+  onResize: () => {},
 };
 
 export default Question;

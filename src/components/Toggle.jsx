@@ -1,5 +1,6 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect, useRef, forwardRef } from "react";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 import { fontStyle } from "../utils";
 
 import "./Toggle.css";
@@ -67,38 +68,42 @@ const getOptionId = (toggleIndex, choiceIndex) => {
   return `option-${toggleIndex}-${choiceIndex}`;
 };
 
-const CurrentOptionWrapper = ({
-  refToPass,
-  baseWidth,
-  baseHeight,
-  baseFontSize,
-  children,
-  theme,
-  currentChoiceCoordinates = {},
-}) => {
-  return (
-    <CurrentOption
-      className={
-        currentChoiceCoordinates.animate ? "transition-left" : "no-transition"
-      }
-      top={currentChoiceCoordinates.top}
-      left={currentChoiceCoordinates.left}
-      baseWidth={baseWidth}
-      baseHeight={baseHeight}
-      baseFontSize={baseFontSize}
-      ref={refToPass}
-      themeColour={theme.currentTheme.bottom}
-    >
-      <CurrentOptionInterior
+const CurrentOptionWrapper = forwardRef(
+  (
+    {
+      baseWidth,
+      baseHeight,
+      baseFontSize,
+      children,
+      theme,
+      currentChoiceCoordinates,
+    },
+    ref
+  ) => {
+    return (
+      <CurrentOption
+        className={
+          currentChoiceCoordinates.animate ? "transition-left" : "no-transition"
+        }
+        top={currentChoiceCoordinates.top}
+        left={currentChoiceCoordinates.left}
         baseWidth={baseWidth}
         baseHeight={baseHeight}
         baseFontSize={baseFontSize}
+        ref={ref}
+        themeColour={theme.currentTheme.bottom}
       >
-        {children}
-      </CurrentOptionInterior>
-    </CurrentOption>
-  );
-};
+        <CurrentOptionInterior
+          baseWidth={baseWidth}
+          baseHeight={baseHeight}
+          baseFontSize={baseFontSize}
+        >
+          {children}
+        </CurrentOptionInterior>
+      </CurrentOption>
+    );
+  }
+);
 
 const Toggle = ({
   identifier,
@@ -112,7 +117,7 @@ const Toggle = ({
   const [currentChoice, setCurrentChoice] = useState(null);
   const [currentChoiceCoordinates, setCurrentChoiceCoordinates] =
     useState(null);
-  const correctOptionRef = useRef();
+  const currentOptionRef = useRef();
 
   const [choicesArray, correctIndex] = useMemo(
     () => shuffleOptions([correctChoice, ...incorrectChoices], correctChoice),
@@ -141,8 +146,8 @@ const Toggle = ({
     if (currentChoice === null) {
       return;
     }
-    if (correctOptionRef.current.style.display !== "inline") {
-      correctOptionRef.current.style.display = "inline";
+    if (currentOptionRef.current.style.display !== "inline") {
+      currentOptionRef.current.style.display = "inline";
     }
     const selectedContainer = document.querySelector(
       `#${getOptionId(identifier, currentChoice)}`
@@ -179,7 +184,7 @@ const Toggle = ({
         baseWidth={baseWidth}
         baseHeight={baseHeight}
         baseFontSize={baseFontSize}
-        refToPass={correctOptionRef}
+        ref={currentOptionRef}
         theme={theme}
         currentChoiceCoordinates={currentChoiceCoordinates || {}}
       />
@@ -204,6 +209,76 @@ const Toggle = ({
       ))}
     </Wrapper>
   );
+};
+
+Toggle.propTypes = {
+  identifier: PropTypes.number.isRequired,
+  correctChoice: PropTypes.string,
+  incorrectChoices: PropTypes.arrayOf(PropTypes.string),
+  onCorrect: PropTypes.func,
+  onChange: PropTypes.func,
+  baseSizes: PropTypes.shape({
+    baseWidth: PropTypes.number,
+    baseHeight: PropTypes.number,
+    baseFontSize: PropTypes.number,
+    baseSpacing: PropTypes.number,
+  }),
+  theme: PropTypes.shape({
+    currentTheme: PropTypes.shape({
+      top: PropTypes.string,
+      bottom: PropTypes.string,
+    }),
+    startTheme: PropTypes.shape({
+      top: PropTypes.string,
+      bottom: PropTypes.string,
+    }),
+    targetTheme: PropTypes.shape({
+      top: PropTypes.string,
+      bottom: PropTypes.string,
+    }),
+    endTheme: PropTypes.shape({
+      top: PropTypes.string,
+      bottom: PropTypes.string,
+    }),
+  }),
+};
+
+Toggle.defaultProps = {
+  onCorrect: () => {},
+  onChange: () => {},
+};
+
+CurrentOptionWrapper.propTypes = {
+  baseWidth: PropTypes.number,
+  baseHeight: PropTypes.number,
+  baseFontSize: PropTypes.number,
+  theme: PropTypes.shape({
+    currentTheme: PropTypes.shape({
+      top: PropTypes.string,
+      bottom: PropTypes.string,
+    }),
+    startTheme: PropTypes.shape({
+      top: PropTypes.string,
+      bottom: PropTypes.string,
+    }),
+    targetTheme: PropTypes.shape({
+      top: PropTypes.string,
+      bottom: PropTypes.string,
+    }),
+    endTheme: PropTypes.shape({
+      top: PropTypes.string,
+      bottom: PropTypes.string,
+    }),
+  }),
+  currentChoiceCoordinates: PropTypes.shape({
+    top: PropTypes.number,
+    left: PropTypes.number,
+    animate: PropTypes.bool,
+  }),
+};
+
+CurrentOptionWrapper.defaultProps = {
+  currentChoiceCoordinates: {},
 };
 
 export default Toggle;

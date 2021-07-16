@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 import { Question } from "./";
 import { shuffle } from "../utils";
 
@@ -135,6 +136,20 @@ const Quiz = ({ data }) => {
       </QuizColumn>
     </QuizWrapper>
   );
+};
+
+Quiz.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      question: PropTypes.string,
+      answerSets: PropTypes.arrayOf(
+        PropTypes.shape({
+          correctChoice: PropTypes.string,
+          incorrectChoice: PropTypes.arrayOf(PropTypes.string),
+        })
+      ),
+    })
+  ),
 };
 
 export default Quiz;
