@@ -1,0 +1,7 @@
+.no-transitions {
+  transition: none !important;
+}
+
+.transition-left {
+  transition: left 0.4s ease-in-out;
+}
