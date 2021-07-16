@@ -1,7 +1,7 @@
 # quiz
 React component to display a series of question with varying numbers of multiple choice collections
 
-###Assumptions
+### Assumptions
 
 - The screen used to display the quiz/questions isn't too small
 - The window is unlikely to undergo extensive resizing
